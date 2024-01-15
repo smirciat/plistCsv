@@ -1,0 +1,40 @@
+<div>
+    <input class="form-control" type="file" id="file" name="file" multiple/>
+    <br>
+    <button class="btn btn-success" ng-click="ifit.add()">GO!</button>
+   <br>
+</div>
+<div class="partition">
+    <div flex layout="row">
+      <div flex layout="row" id="content">
+        <div flex layout="column">
+         <md-content flex class="space">
+            <table class="table table-striped table-responsive table-hover">
+                <thead>
+                  <tr>
+                    <th ng-repeat="title in ifit.fieldTitles">{{title}}</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                  </tr>    
+                </thead>
+                <tbody>
+                  <tr ng-repeat="workout in ifit.workouts | orderBy:'jsDate':true">
+                    <td ng-repeat="field in ifit.fields">
+                        <a ng-attr-id="{{'a'+field++workout._id}}" class="focusA" href="#" ng-focus="workout['focus'+field]=true">
+                            <p ng-hide="workout['focus'+field]">{{ifit.formatWorkout(workout,field)}}</p>
+                            <input ng-attr-id="{{'i'+field+workout._id}}" ng-show="workout['focus'+field]" type="text" ng-model="workout[field]" 
+                                ng-blur="workout['focus'+field]=false"/>
+                        </a>
+                    </td>
+                    <td><button class="btn btn-xs btn-success" ng-click="ifit.updateRow(workout)">Update</button></td>
+                    <td><button class="btn btn-xs btn-danger" ng-click="ifit.deleteRow(workout)">Delete</button></td>
+                    <td><button class="btn btn-xs btn-default" ng-click="ifit.resync(workout)">Resync</button></td>
+                  </tr>    
+                </tbody>
+            </table>
+         </md-content>
+        </div>
+      </div>
+    </div>
+</div>
