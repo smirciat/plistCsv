@@ -97,9 +97,13 @@ export function create(req, res) {
 
 export async function upload(req,res){
   var file=new Buffer.from(req.body.data,"base64");
-  var obj = await bplist.parseFile(file);
+  var obj = await bplist.parseFile(file).catch(err=>{
+    console.log(err);
+    err.response="Bad file format";
+    res.status(500).json(err);
+  });
   var jsonData=JSON.stringify(obj);
-  res.status(200).json(jsonData);//(end();
+  if (jsonData) res.status(200).json(jsonData);//(end();
 }
 
 // Updates an existing Workout in the DB

@@ -18,7 +18,7 @@ class IfitComponent {
       this.workouts.forEach(workout=>{
         //workout.raw=JSON.parse(workout.raw);
         workout.jsDate=new Date(workout.date);
-        this.anchorClick(workout._id);
+        this.timeout(this.anchorClick(workout._id),0);
       });
     });
     
@@ -54,19 +54,15 @@ class IfitComponent {
   }
   
   add(){
-    this.timeout(()=>{console.log(this.workouts)},5000);
     var files = Array.from(document.getElementById('file').files);
     var r,data;
     files.forEach(f=>{
       var workout={};
       r = new FileReader();
       r.onloadend = e=>{
-        data = e.target.result;
-        //console.log(data)
         const parser = new DOMParser();
-        const srcDOM = parser.parseFromString(data, "application/xml");
+        const srcDOM = parser.parseFromString(e.target.result, "application/xml");
         workout.raw=this.xml2json(srcDOM).TrainingCenterDatabase.Activities.Activity;
-        //console.log(workout.raw);
         workout.name=workout.raw.Notes;
         workout.date=new Date(workout.raw.Id).toLocaleDateString() + ' ' + new Date(workout.raw.Id).toLocaleTimeString();
         workout.jsDate=new Date(workout.raw.Id);
@@ -78,10 +74,10 @@ class IfitComponent {
         workout.maxHR=workout.raw.Lap.MaximumHeartRateBpm.Value;
         workout.raw=JSON.stringify(workout.raw);
         this.http.post('/api/workouts',workout).then(res=>{
-          console.log(res.data);
           workout._id=res.data._id;
           workout.raw=JSON.parse(workout.raw);
           this.workouts.push(workout);
+          this.timeout(this.anchorClick(workout._id),0);
         }).catch(err=>{
           console.log(err);
         });
@@ -95,7 +91,6 @@ class IfitComponent {
     this.http.get('/api/workouts/'+workout._id).then(res=>{
       res.data.raw=JSON.parse(res.data.raw);
       res.data.jsDate=new Date(res.data.date);
-      console.log(res.data);
       const pos = this.workouts.map(e => e._id).indexOf(workout._id);
       this.workouts.splice(pos,1);
       this.workouts.push(res.data);

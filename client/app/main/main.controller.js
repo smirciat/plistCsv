@@ -11,7 +11,8 @@ class MainController {
     //4.  update this.startDate for beginning flight records to import line 14
     //4.  open /xml route, wait for console.log, then click download
     //5.  result.csv can be imported into database file for mccPilotLog (watch for nulls)
-    this.startDate=new Date('5/24/2023');//now done through 1/9/2024
+    var date = new Date();
+    this.startDate=new Date(date.getFullYear(), date.getMonth(), 1);//now done through 1/9/2024
     this.http=$http;
     this.timeout=$timeout;
     this.interval=$interval;
@@ -168,37 +169,6 @@ class MainController {
     },3000);
   }
   
-  xml2json(srcDOM) {
-    var children = [...srcDOM.children];
-    
-    // base case for recursion. 
-    if (!children.length) {
-      return srcDOM.innerHTML;
-    }
-    
-    // initializing object to be returned. 
-    var jsonResult = {};
-    
-    for (var child of children) {
-      
-      // checking is child has siblings of same name. 
-      var childIsArray = children.filter(eachChild => eachChild.nodeName === child.nodeName).length > 1;
-  
-      // if child is array, save the values as array, else as strings. 
-      if (childIsArray) {
-        if (jsonResult[child.nodeName] === undefined) {
-          jsonResult[child.nodeName] = [this.xml2json(child)];
-        } else {
-          jsonResult[child.nodeName].push(this.xml2json(child));
-        }
-      } else {
-        jsonResult[child.nodeName] = this.xml2json(child);
-      }
-    }
-    
-    return jsonResult;
-  }
-  
   isItLoading(){
       return this.loading;
     }
@@ -224,15 +194,16 @@ class MainController {
     this.loading=true;
     this.fullyComplete=false;
     var f = document.getElementById('file').files[0];
-    //console.log(f);
     var r = new FileReader();
       r.onloadend = e=>{
-        this.data = e.target.result;
-        //convert data to blob?
-        this.http.post('/api/workouts/upload',{data:btoa(this.data)}).then(res=>{
+        this.http.post('/api/workouts/upload',{data:btoa(e.target.result)}).then(res=>{
           this.Json=JSON.parse(res.data)[0];
-          //console.log(this.Json)
           this.convertToCSV();
+        }).catch(err=>{
+          this.fullyComplete=false;
+          this.loading=false;
+          alert(err.data.response);
+          console.log(err);
         });
       };
       r.readAsBinaryString(f);
