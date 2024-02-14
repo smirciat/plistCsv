@@ -19,6 +19,7 @@
     <!-- build:css({.tmp,client}) app/app.css -->
       <link rel="stylesheet" href="app/app.css">
       <!-- injector:css -->
+      <link rel="stylesheet" href="app/ap/ap.css">
       <link rel="stylesheet" href="app/app.css">
       <link rel="stylesheet" href="app/ifit/ifit.css">
       <link rel="stylesheet" href="app/main/main.css">
@@ -50,6 +51,10 @@
     <script src="bower_components/es5-shim/es5-shim.js"></script>
     <script src="bower_components/json3/lib/json3.min.js"></script>
     <![endif]-->
+    <script src="bower_components/pdfform/minipdf.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.3/pako.min.js" integrity="sha256-X7u/eQo6oIgWqc5jOmTjQn3loM8Lse0ock76Gkkn/Ro=" crossorigin="anonymous"></script>
+    <script src="bower_components/pdfform/pdfform.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.0.0/FileSaver.min.js"></script>
     <!-- build:js({client,node_modules}) app/vendor.js -->
       <!-- bower:js -->
       <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -60,21 +65,25 @@
       <script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
       <script src="bower_components/lodash/dist/lodash.compat.js"></script>
       <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+      <script src="bower_components/moment/moment.js"></script>
+      <script src="bower_components/angular-moment/angular-moment.js"></script>
       <!-- endbower -->
     <!-- endbuild -->
     <!-- build:js(.tmp) app/app.js -->
       <script src="app/app.js"></script>
       <!-- injector:js -->
       <script src="components/util/util.module.js"></script>
-      <script src="components/footer/footer.directive.js"></script>
+      <script src="app/main/main.js"></script>
+      <script src="app/app.constant.js"></script>
+      <script src="app/ifit/ifit.controller.js"></script>
       <script src="app/ifit/ifit.js"></script>
       <script src="app/main/main.controller.js"></script>
-      <script src="app/main/main.js"></script>
-      <script src="app/ifit/ifit.controller.js"></script>
+      <script src="app/ap/ap.js"></script>
+      <script src="components/footer/footer.directive.js"></script>
       <script src="components/modal/modal.service.js"></script>
       <script src="components/navbar/navbar.controller.js"></script>
       <script src="components/navbar/navbar.directive.js"></script>
-      <script src="app/app.constant.js"></script>
+      <script src="app/ap/ap.controller.js"></script>
       <script src="components/util/util.service.js"></script>
       <!-- endinjector -->
     <!-- endbuild -->

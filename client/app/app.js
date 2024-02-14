@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('plistCsvApp', ['plistCsvApp.constants', 'ngCookies', 'ngResource', 'ngSanitize',
-    'ui.router', 'ui.bootstrap'
+    'ui.router', 'ui.bootstrap','angularMoment'
   ])
   .config(function($urlRouterProvider, $locationProvider, $compileProvider) {
     $urlRouterProvider.otherwise('/');

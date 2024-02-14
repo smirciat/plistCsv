@@ -75,11 +75,12 @@ class IfitComponent {
         workout.raw=JSON.stringify(workout.raw);
         this.http.post('/api/workouts',workout).then(res=>{
           workout._id=res.data._id;
-          workout.raw=JSON.parse(workout.raw);
+          workout.raw=undefined;
           this.workouts.push(workout);
           this.timeout(this.anchorClick(workout._id),0);
         }).catch(err=>{
           console.log(err);
+          alert(err);
         });
       };
       r.readAsBinaryString(f);
@@ -96,15 +97,17 @@ class IfitComponent {
       this.workouts.push(res.data);
     }).catch(err=>{
       console.log(err);
+      alert(err);
     });
   }
   
   updateRow(workout){
     if (workout.raw) workout.raw=JSON.stringify(workout.raw);
     this.http.put('/api/workouts/'+workout._id,workout).then(res=>{
-      console.log('updated');
+      alert('Workout Updated');
     }).catch(err=>{
       console.log(err);
+      alert(err);
     });
   }
   
@@ -114,6 +117,7 @@ class IfitComponent {
       this.workouts.splice(pos,1);
     }).catch(err=>{
       console.log(err);
+      alert(err);
     });
   }
   

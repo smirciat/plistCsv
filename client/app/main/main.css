@@ -92,3 +92,14 @@
     from { transform: scale(1) rotate(0deg);}
     to { transform: scale(1) rotate(360deg);}
 }
+
+.input-group {
+    display: inline-table;
+    vertical-align: middle;
+}
+
+.input-group-addon,
+.input-group-btn,
+.form-control {
+    width: auto !important;
+}
