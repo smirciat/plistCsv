@@ -20,9 +20,17 @@
      </div>
     </div>
     <div class="row">
-      <div class="col-xs-6">
+      <div class="col-xs-4">
         <input class="form-control" type="checkbox" ng-model="main.monthly" id="monthly" name="monthly"/>
         <label for="monthly">Check box above to generate a monthly time sheet instead of a CSV file</label>
+      </div>  
+      <div class="col-xs-4">
+        <input class="form-control" type="checkbox" ng-model="main.closeout" id="closeout" name="closeout"/>
+        <label for="closeout">Check box above to close out the month</label>
+      </div>  
+      <div class="col-xs-4">
+        <input class="form-control" type="checkbox" ng-model="main.twilight" id="twighlight" name="twilight" ng-change="main.twilightChanged()"/>
+        <label for="twilight">Check box above to calculate twilight times</label>
       </div>  
     </div>  
     <br>
@@ -34,4 +42,5 @@
   </div>
   <a class="btn btn-primary" download="result.csv" ng-href="{{ main.url }}" ng-click="main.download()" ng-if="main.isItComplete()">Download CSV File</a>
   <button class="btn btn-success" ng-if="main.isItFullyComplete()">Success! Check Download Folder!</button>
+  <button class="btn btn-warning" ng-if="main.twilightComplete" ng-click="main.makePDF()">Twilight Calculations Comlete!</button>
 </div>
