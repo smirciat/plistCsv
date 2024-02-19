@@ -54,11 +54,11 @@ class IfitComponent {
   }
   
   add(){
-    var files = Array.from(document.getElementById('file').files);
-    var r,data;
+    let inputFiles=document.getElementById('file');
+    let files = Array.from(inputFiles.files);
     files.forEach(f=>{
-      var workout={};
-      r = new FileReader();
+      let workout={};
+      let r = new FileReader();
       r.onloadend = e=>{
         const parser = new DOMParser();
         const srcDOM = parser.parseFromString(e.target.result, "application/xml");
@@ -77,7 +77,10 @@ class IfitComponent {
           workout._id=res.data._id;
           workout.raw=undefined;
           this.workouts.push(workout);
-          this.timeout(this.anchorClick(workout._id),0);
+          this.timeout(()=>{
+            this.anchorClick(workout._id);
+            inputFiles.value='';     
+          },0);
         }).catch(err=>{
           console.log(err);
           alert(err);

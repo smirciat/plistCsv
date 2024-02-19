@@ -179,40 +179,40 @@ class MainController {
         let flightMinutes=0;
         //dayTO+=flight.onOffArray.length;
         //lnd+=flight.onOffArray.length;
-        flight.onOffArray.forEach((onOff,onOffIndex)=>{
-          let end=this.convertMoment(onOff.on);
-          //console.log(end)
-          let start=this.convertMoment(onOff.off);
-          let duration=this.moment.duration(end.diff(start)).asMinutes();
-          flightMinutes+=duration;
-          if (this.twilight){
-            let index=this.airports.map(e => e.threeLetter).indexOf(flight.routeArray[onOffIndex]);
-            if (index<0) {
-              dayTO++;
-              dayLND++;
-              //if (d>=this.daysInMonth) this.twilightComplete=true;
+        if (flight.onOffArray&&flight.onOffArray.length>0&&flight.onOffArray[0].on&&flight.onOffArray[0].off) {
+          flight.onOffArray.forEach((onOff,onOffIndex)=>{
+            if (!onOff.on||!onOff.off) return;
+            let end=this.convertMoment(onOff.on);
+            let start=this.convertMoment(onOff.off);
+            let duration=this.moment.duration(end.diff(start)).asMinutes();
+            flightMinutes+=duration;
+            if (this.twilight){
+              let index=this.airports.map(e => e.threeLetter).indexOf(flight.routeArray[onOffIndex]);
+              let index1=this.airports.map(e => e.threeLetter).indexOf(flight.routeArray[onOffIndex+1]);
+              let times,twilightStart,twilightEnd;
+              if (this.airports[index]){
+                times = SunCalc.getTimes(new Date(start), this.airports[index].latitude, this.airports[index].longitude);
+                twilightStart = this.moment(times.dawn);
+                twilightEnd = this.moment(times.dusk);
+                if (start.isBetween(twilightStart,twilightEnd)) dayTO++;
+                else nightTO++;
+              }
+              else dayTO++;
+              if (this.airports[index1]){
+                times = SunCalc.getTimes(new Date(start), this.airports[index+1].latitude, this.airports[index1].longitude);
+                twilightStart = this.moment(times.dawn);
+                twilightEnd = this.moment(times.dusk);
+                if (end.isBetween(twilightStart,twilightEnd)) dayLND++;
+                else nightLND++;
+              }
+              else dayLND++;
             }
             else {
-              let times = SunCalc.getTimes(new Date(start), this.airports[index].latitude, this.airports[index].longitude);
-              let twilightStart = this.moment(times.dawn);
-              let twilightEnd = this.moment(times.dusk);
-              if (start.isBetween(twilightStart,twilightEnd)) dayTO++;
-              else nightTO++;
-              times = SunCalc.getTimes(new Date(start), this.airports[index+1].latitude, this.airports[index+1].longitude);
-              twilightStart = this.moment(times.dawn);
-              twilightEnd = this.moment(times.dusk);
-              if (end.isBetween(twilightStart,twilightEnd)) dayLND++;
-              else nightLND++;
-              //if (d>=this.daysInMonth) this.twilightComplete=true;
+              dayTO++;
+              dayLND++;
             }
-          }
-          else {
-            dayTO++;
-            dayLND++;
-            //if (d>=this.daysInMonth) this.twilightComplete=true;
-          }
-          //flight.routeArray[index] will show airports corresponding to these times, length is one greater than onOffArray due to beginning and ending airport
-        });
+          });
+        }
         dayMinutes+=flightMinutes;
       });
       monthMinutes+=dayMinutes;
@@ -262,7 +262,6 @@ class MainController {
     if (this.daysInMonth<31) this.fields.T360=["N/A"];
     if (this.daysInMonth<30) this.fields.T348=["N/A"];
     if (this.daysInMonth<29) this.fields.T336=["N/A"];
-    //if (!this.twilight) this.twilightComplete=true;
   }
   
   makePDF(){
@@ -299,10 +298,11 @@ class MainController {
       this.flights=[];
       let csvHeader="TODay,LdgDay,TimeOff,TimeOn,FlightDate,Aircraft,AircraftCode,origin,destination,intermediate,DepCode,ArrCode,minTotal,minPIC,minXC,minIFR,P1Code,PF,CurrRent,CurrPilot,CurrPerDiem,BaseOffSet,DepOffset,ArrOffset,FlightNumber,Remarks,TypeOfInstr,NextPage,Pairing,UserN2,Report";//"date,aircraft,startLocation,endLocation,intermediateLocations,totalFlightTime,landings";
       let csv=csvHeader+"\n";
-      let flightInfo,month,index,ftArray,dash,monthString,dayString,digits;
+      let flightInfo,month,index,dash,monthString,dayString,digits;
       //this.Json=this.jsonPlist;//this.xml2json(srcDOM);
       digits=3;
       for (let x=0;x<this.Json.length;x++) {
+        //console.log(this.Json[x]);
         if (!this.Json[x]||this.Json[x].acftNumber===undefined||
                 this.Json[x].acftNumber==="") continue;
         if (this.empNum.length>3) digits=4;
