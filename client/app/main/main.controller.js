@@ -296,7 +296,7 @@ class MainController {
     
   buildFlightInfo(){
       this.flights=[];
-      let csvHeader="TODay,LdgDay,TimeOff,TimeOn,FlightDate,Aircraft,AircraftCode,origin,destination,intermediate,DepCode,ArrCode,minTotal,minPIC,minXC,minIFR,P1Code,PF,CurrRent,CurrPilot,CurrPerDiem,BaseOffSet,DepOffset,ArrOffset,FlightNumber,Remarks,TypeOfInstr,NextPage,Pairing,UserN2,Report";//"date,aircraft,startLocation,endLocation,intermediateLocations,totalFlightTime,landings";
+      let csvHeader="TODay,LdgDay,TimeOff,TimeOn,FlightDate,Aircraft,AircraftCode,origin,destination,intermediate,DepCode,ArrCode,minTotal,minPIC,minXC,minIFR,P1Code,PF,CurrRent,CurrPilot,CurrPerDiem,BaseOffSet,DepOffset,ArrOffset,FlightNumber,Remarks,TypeOfInstr,NextPage,Pairing,UserN2,Report,minNight";//"date,aircraft,startLocation,endLocation,intermediateLocations,totalFlightTime,landings";
       let csv=csvHeader+"\n";
       let flightInfo,month,index,dash,monthString,dayString,digits;
       //this.Json=this.jsonPlist;//this.xml2json(srcDOM);
@@ -353,21 +353,43 @@ class MainController {
           flightInfo.timeOff=new Date(flightInfo.onOffArray[0].off).toLocaleTimeString();
           flightInfo.timeOn=new Date(flightInfo.onOffArray[flightInfo.onOffArray.length-1].on).toLocaleTimeString();
           flightInfo.flightNumber=this.Json[x].flightNumber;
+          flightInfo.night=0;
+          let legInfo=JSON.parse(JSON.stringify(flightInfo));
+          legInfo.onOffArray.forEach((element,index)=>{
+            legInfo.intermediates="-";
+            legInfo.timeOff=new Date(element.off).toLocaleTimeString();
+            legInfo.timeOn=new Date(element.on).toLocaleTimeString();
+            legInfo.flightTimeMinutes=(new Date(element.on)-new Date(element.off))/(1000*60);
+            legInfo.flightTimeDecimal=legInfo.flightTimeMinute/60;
+            legInfo.departure=legInfo.routeArray[index];
+            legInfo.destination=legInfo.routeArray[index+1];
+            legInfo.landings=1;
+            legInfo.night=0;
+            let momentOff=this.moment(element.off);
+            let momentOn=this.moment(element.on);
+            let airportIndex=this.airports.map(e => e.threeLetter).indexOf(legInfo.departure);
+            if (this.airports[airportIndex]) {
+              let times=SunCalc.getTimes(new Date(element.off),this.airports[airportIndex].latitude, this.airports[airportIndex].longitude);
+              let dawn=this.moment(times.dawn);
+              let dusk=this.moment(times.dusk);
+              let onNight=!momentOn.isBetween(dawn,dusk);
+              let offNight=!momentOff.isBetween(dawn,dusk);
+              if (offNight){
+                if (onNight){
+                  legInfo.night=legInfo.flightTimeMinutes;
+                }
+                else{
+                  legInfo.night=Math.floor(this.moment.duration(dawn.diff(momentOff)).asMinutes());
+                }
+              }
+              else if (onNight){
+                legInfo.night=Math.floor(this.moment.duration(momentOn.diff(dusk)).asMinutes());
+              }
+            }
+            flightInfo.night+=legInfo.night;
+            if (this.multiple) csv+=this.addCsvLine(legInfo);
+          });
           if (!this.multiple) csv+=this.addCsvLine(flightInfo);
-          else {
-            let legInfo=JSON.parse(JSON.stringify(flightInfo));
-            legInfo.onOffArray.forEach((element,index)=>{
-              legInfo.intermediates="-";
-              legInfo.timeOff=new Date(element.off).toLocaleTimeString();
-              legInfo.timeOn=new Date(element.on).toLocaleTimeString();
-              legInfo.flightTimeMinutes=(new Date(element.on)-new Date(element.off))/(1000*60);
-              legInfo.flightTimeDecimal=legInfo.flightTimeMinute/60;
-              legInfo.departure=legInfo.routeArray[index];
-              legInfo.destination=legInfo.routeArray[index+1];
-              legInfo.landings=1;
-              csv+=this.addCsvLine(legInfo);
-            });
-          }
           this.flights.push(flightInfo);
         }
       }
@@ -386,7 +408,7 @@ class MainController {
     csvLine+=flightInfo.flightTimeMinutes+','+flightInfo.flightTimeMinutes+','+flightInfo.flightTimeMinutes+','+flightInfo.flightTimeMinutes+',';
     csvLine+='1,1,9,9,9,-540,-540,-540,';
     csvLine+=flightInfo.flightNumber+','+flightInfo.intermediates+',';
-    csvLine+=" ,0, , , ";
+    csvLine+=" ,0, , , ,"+flightInfo.night;
     csvLine+="\n";
     return csvLine;
   }
