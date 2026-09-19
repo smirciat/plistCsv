@@ -1,0 +1,15 @@
+<div style="margin-left:50px">
+  <h2>Quiz</h2>
+  <h3>{{quiz.currentQuestion.question}}</h3>
+  <div ng-repeat="choice in quiz.currentQuestion.fourAnswers">
+    <button class="btn btn-secondary" ng-click="quiz.checkAnswer($index)">{{choice}}</button>
+    <button class="btn btn-danger" ng-if="quiz.wrong[$index]">Wrong!</button>
+    <button class="btn btn-success" ng-if="quiz.right[$index]">Correct!</button>
+    <br><br>
+  </div>
+  <button class="btn btn-default" ng-click="quiz.previousQuestion()">Previous</button>
+  <button class="btn btn-primary" ng-click="quiz.nextQuestion()">Next</button>
+  <br>
+  <h4>Viewing question {{quiz.getProgress()}}</h4>
+  <p>So far {{quiz.getCorrect()}}</p>
+</div>

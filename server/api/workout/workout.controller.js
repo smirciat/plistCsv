@@ -103,7 +103,7 @@ export async function upload(req,res){
     res.status(500).json(err);
   });
   var jsonData=JSON.stringify(obj);
-  if (jsonData) res.status(200).json(jsonData);//(end();
+  if (jsonData) res.status(200).json(obj);//(end();
 }
 
 // Updates an existing Workout in the DB

@@ -1,8 +1,15 @@
 <div style="margin-left:30px;">
   <h1>Generate CSV File From iPad Backup</h1>
-  <h3>Input Starting Date for CSV File Here</h3>
-  <div style="display:inline-block; min-height:290px;">
-    <uib-datepicker ng-model="main.startDate" show-weeks="true" class="well well-sm"></uib-datepicker>
+  <h3>Date range (plist filter and Firebase load)</h3>
+  <div class="row">
+    <div class="col-sm-6" style="display:inline-block; min-height:290px;">
+      <p><strong>Start</strong></p>
+      <uib-datepicker ng-model="main.startDate" show-weeks="true" class="well well-sm"></uib-datepicker>
+    </div>
+    <div class="col-sm-6" style="display:inline-block; min-height:290px;">
+      <p><strong>End</strong></p>
+      <uib-datepicker ng-model="main.endDate" show-weeks="true" class="well well-sm"></uib-datepicker>
+    </div>
   </div>
   <h3>Input FlightIndex.plist Here</h3>
   <p>On the iPad, make a local backup of your flights.  Find the zip file in your files app, and extract it.  Then find your FlightIndex.plist file (near the bottom) and input it here.</p>
@@ -20,23 +27,27 @@
      </div>
     </div>
     <div class="row">
-      <div class="col-xs-4">
+      <div class="col-xs-6">
         <input class="form-control" type="checkbox" ng-model="main.monthly" id="monthly" name="monthly"/>
         <label for="monthly">Check box above to generate a monthly time sheet instead of a CSV file</label>
       </div>  
-      <div class="col-xs-4">
+      <div class="col-xs-6">
         <input class="form-control" type="checkbox" ng-model="main.closeout" id="closeout" name="closeout"/>
         <label for="closeout">Check box above to close out the month</label>
       </div>  
-      <div class="col-xs-4">
+      <!--<div class="col-xs-4">
         <input class="form-control" type="checkbox" ng-model="main.twilight" id="twighlight" name="twilight" ng-change="main.twilightChanged()"/>
         <label for="twilight">Check box above to calculate twilight times</label>
-      </div>  
+      </div>  -->
     </div>  
     <br>
     <button class="btn btn-success" ng-click="main.add()" ng-if="main.isThereAFile()" ng-disabled="main.isItLoading()">
       <span ng-if="main.isItLoading()" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
       Add Plist File and Go</button>
+    <button class="btn btn-info" ng-click="main.loadFromFirebase()" ng-disabled="main.isItLoading()" style="margin-left:8px;">
+      <span ng-if="main.isItLoading()" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+      Load from Firebase (flightIndex)</button>
+    <p class="text-muted">Firebase uses <code>pilots/{emp}/flightIndex</code> (same fields as FlightIndex.plist), then the same CSV logic as a file upload.</p>
     <br>
     <br>
   </div>

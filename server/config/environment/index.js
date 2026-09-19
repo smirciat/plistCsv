@@ -18,11 +18,11 @@ var all = {
   // Root path of server
   root: path.normalize(__dirname + '/../../..'),
 
-  // Server port
-  port: 59009||process.env.PORT || 9000,
+  // Server port (nginx TLS 58787 → this port; see /etc/nginx/sites-available/default)
+  port: 58788,
 
   // Server IP
-  ip: '0.0.0.0',
+  ip: '127.0.0.1',
 
   // Should we populate the DB with sample data?
   seedDB: false,

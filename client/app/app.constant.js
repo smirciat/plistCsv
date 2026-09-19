@@ -3,7 +3,7 @@
 
 angular.module('plistCsvApp.constants', [])
 
-.constant('appConfig', {userRoles:['guest','user','admin'],geoToken:'214e46d40b784a0997d583c070670b92'})
+.constant('appConfig', {userRoles:['guest','user','admin'],geoToken:'214e46d40b784a0997d583c070670b92',logbook:{sqlitePath:'uploads/database.db',databaseUrl:'postgres://postgres:IfpbyeRKp2xsyxQ@localhost:5432/rotdb',firebaseEmployeeId:'933',firebaseSyncStatePath:'uploads/logbook-firebase-sync.json'}})
 
 ;
 })(angular);

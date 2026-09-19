@@ -1,0 +1,36 @@
+---
+description: AngularJS 1.x client conventions for plistCSV
+globs: client/**/*
+alwaysApply: false
+---
+
+# Client (AngularJS) conventions
+
+## Module
+
+Root module: **`plistCsvApp`** in `client/app/app.js`.
+
+## Feature layout
+
+`client/app/<feature>/`:
+
+- `<feature>.js` — module + ui-router states
+- `<feature>.controller.js` — logic (main uses `.component('main', …)`)
+- `<feature>.html` — template
+- `*.controller.spec.js` — Karma tests
+
+Shared: `client/components/<name>/`.
+
+## Main route (product)
+
+`client/app/main/main.controller.js` owns CSV column layout, SunCalc night/day splits, employee filter (`empNum`), and plist upload → `/api/workouts/upload`. Treat changes here as **logbook semantics**, not cosmetic refactors.
+
+## Build
+
+Scripts are injected by Grunt (`Gruntfile.js`). No webpack/ES modules on the client.
+
+## Do not
+
+- Migrate to a modern frontend framework
+- Modify `client/bower_components/` directly
+- Change `$locationProvider.html5Mode` without cause

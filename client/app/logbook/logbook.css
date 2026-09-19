@@ -1,0 +1,105 @@
+.logbook-page {
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+.logbook-filters .filter-year {
+  margin-top: 8px;
+}
+
+.logbook-filters .period-hint {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.logbook-filters .filter-checkbox {
+  margin-top: 8px;
+}
+
+.logbook-filters .filter-actions {
+  padding-top: 24px;
+}
+
+.logbook-page .firebase-sync-bar {
+  margin-bottom: 12px;
+}
+
+.logbook-page .firebase-sync-bar .sync-meta {
+  margin-left: 12px;
+}
+
+.logbook-page .firebase-sync-bar .sync-hint {
+  margin: 8px 0 0;
+}
+
+.logbook-page .firebase-sync-bar .backup-after-import {
+  margin-left: 12px;
+}
+
+.logbook-sticky-panel {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin-bottom: 12px;
+  background: #fff;
+  padding-bottom: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.logbook-page .summary-row {
+  margin: 0 0 8px;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  font-size: 13px;
+}
+
+.logbook-page .summary-row-aircraft {
+  margin-bottom: 0;
+}
+
+.logbook-page .annual-panel,
+.logbook-page .totals-panel {
+  margin-bottom: 8px;
+}
+
+.logbook-page .annual-panel:last-child,
+.logbook-page .totals-panel:last-child {
+  margin-bottom: 0;
+}
+
+.logbook-page .annual-note,
+.logbook-page .career-note {
+  margin-bottom: 10px;
+}
+
+.logbook-page .annual-field {
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.logbook-page .annual-label {
+  display: inline-block;
+  min-width: 11em;
+  font-weight: 600;
+}
+
+.logbook-page .annual-value {
+  font-family: monospace;
+  font-size: 14px;
+  margin-right: 6px;
+}
+
+.logbook-page .remarks-cell {
+  max-width: 320px;
+  word-break: break-word;
+  font-size: 12px;
+}
+
+.logbook-page .pager-row {
+  margin-top: 16px;
+}
+
+.logbook-page .page-label {
+  margin: 0 12px;
+}

@@ -1,0 +1,33 @@
+---
+description: Core project context for plistCSV (Flight Report plist → logbook CSV)
+alwaysApply: true
+---
+
+# plistCSV project overview
+
+Angular Full-Stack (generator v3.8) personal app: parse Flight Report **FlightIndex.plist** → **CSV** for pilot logbook import; optional monthly **F12 PDF** on the main route.
+
+## Stack
+
+- Client: AngularJS 1.x (`plistCsvApp`), ui-router, ui-bootstrap, angularMoment, Grunt build
+- Server: Express 4, Sequelize 3, SQLite/PostgreSQL, **bplist-parser** on upload
+- Runtime: Node **^12.22.12** — do not bump Node or major deps without approval
+
+## Conventions
+
+- Primary feature: `client/app/main/` + `server/api/workout/` (upload) + `server/api/airport/`
+- API modules: `server/api/<name>/` with `index.js`, `*.controller.js`, `*.model.js`
+- Register routers in `server/routes.js`
+- Reference stack patterns in **`~/fraBering`** (read-only) for Node 12 and future Firebase
+
+## Build & test
+
+- Dev: `grunt serve` (use `nvm use`)
+- Prod: `grunt build` then `npm start` from `dist/` when deploying built assets
+- Tests: `npm test`
+
+## Do not
+
+- Upgrade Angular, Express, Sequelize, or Node major versions unprompted
+- Replace Grunt/Bower without explicit request
+- Edit fraBering when working on plistCSV unless Andy authorizes

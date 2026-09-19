@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeReadFile": [
+      {
+        "command": "bash .cursor/hooks/protect-sensitive-reads.sh",
+        "failClosed": false
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "bash .cursor/hooks/protect-sensitive-writes.sh",
+        "matcher": "Write|StrReplace|Delete",
+        "failClosed": false
+      }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": "bash .cursor/hooks/protect-destructive-shell.sh",
+        "failClosed": true
+      }
+    ]
+  }
+}

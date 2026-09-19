@@ -1,0 +1,32 @@
+---
+description: Minimal, safe edits for legacy plistCSV
+alwaysApply: true
+---
+
+# Safe change policy
+
+Legacy Angular Full-Stack app. **Working logbook CSV output beats modern style.**
+
+## Scope
+
+- Fix only what the user asked for; no drive-by refactors
+- Do not rename `plistCsvApp` or shuffle generator leftovers unless asked
+- **fraBering (`~/fraBering`) is read-only** for reference unless Andy authorizes writes there
+
+## Logbook / CSV semantics
+
+- Column order and night/day logic in `main.controller.js` map to external logbook import — verify with a sample plist after changes
+- Server plist parsing stays in `workout.controller.js`; do not duplicate parsers on the client
+
+## Database
+
+- No `DROP`, `TRUNCATE`, or `sequelize.sync({ force: true })`
+
+## Dependencies
+
+- Avoid new npm/bower packages unless necessary
+- Match `'use strict'`, Babel 6 on server, existing AngularJS patterns
+
+## Commits
+
+- Only commit when the user explicitly asks

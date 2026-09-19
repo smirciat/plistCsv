@@ -1,0 +1,25 @@
+---
+description: Secrets and sensitive paths for plistCSV
+alwaysApply: true
+---
+
+# Protected files and secrets
+
+## Never commit, paste, or overwrite
+
+- `server/config/local.env.js`
+- `server/config/environment/development.js` if it holds machine-specific DB settings
+- `server/firebase.json` — Firebase service account (gitignored)
+- `.env`, `*.sqlite`, `npm-debug.log`
+
+## Edit only with explicit user approval
+
+- `server/config/express.js` — Express middleware and static asset paths
+- `server/config/environment/production.js`
+- `client/app/main/main.controller.js` — CSV/PDF business rules (large, easy to break logbook import)
+
+## Safe patterns
+
+- Document new env vars in `server/config/local.env.sample.js` only
+- Tell the user which local file to edit instead of writing secrets into tracked files
+- Prefer `*.sample.js` templates over live config when explaining setup

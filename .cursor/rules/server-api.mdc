@@ -1,0 +1,31 @@
+---
+description: Express/Sequelize API conventions for plistCSV
+globs: server/**/*
+alwaysApply: false
+---
+
+# Server API conventions
+
+## Module structure
+
+`server/api/<name>/`: `index.js`, `*.controller.js`, `*.model.js`, optional `*.integration.js`.
+
+## Critical endpoints
+
+- **`POST /api/workouts/upload`** — base64 plist body → `bplist-parser` → JSON array for the client (`workout.controller.js`)
+- **`GET /api/airports`** — airport lat/long for twilight logic
+- **`GET /pdf`** — serves `server/pdfs/*.pdf` for F12 generation
+
+## Controllers
+
+- Server uses Babel 6 `import`/`export` and Sequelize 3 promise style (`.then/.catch`) consistent with the file
+- Register new routers in `server/routes.js`
+
+## Firebase
+
+Not initialized in server code yet. Credentials file: `server/firebase.json` (gitignored). See `docs/firebase-future.md`.
+
+## Do not
+
+- Add `sequelize.sync({ force: true })` or destructive SQL
+- Log or return full plist payloads in production without need

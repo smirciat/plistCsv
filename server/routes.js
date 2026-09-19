@@ -9,8 +9,11 @@ import path from 'path';
 
 export default function(app) {
   // Insert routes below
+  app.use('/api/questions', require('./api/question'));
   app.use('/api/airports', require('./api/airport'));
   app.use('/api/workouts', require('./api/workout'));
+  app.use('/api/flights', require('./api/flight'));
+  app.use('/api/logbook', require('./api/logbook'));
   app.get('/pdf', function(req, res){
     if (req.query) res.sendFile("./pdfs/" + req.query.filename, {root: __dirname});
     else res.status(500);

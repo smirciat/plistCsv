@@ -1,0 +1,176 @@
+<div class="container logbook-page">
+  <h1>Logbook</h1>
+  <p class="text-muted" ng-if="lb.status">
+    Logbook
+    <span ng-if="lb.status.available"> — {{ lb.status.flightCount | number }} flights ({{ lb.status.source || 'sqlite' }}).</span>
+    <span ng-if="!lb.status.available" class="text-danger"> — database file not found.</span>
+  </p>
+  <div class="well well-sm firebase-sync-bar" ng-if="lb.status && lb.status.available">
+    <button class="btn btn-info" type="button" ng-click="lb.syncFromFirebase()"
+            ng-disabled="lb.syncing || lb.loading || lb.backingUp">
+      <span ng-if="!lb.syncing">Import from Firebase</span>
+      <span ng-if="lb.syncing">Syncing…</span>
+    </button>
+    <button class="btn btn-default" type="button" ng-click="lb.backupPostgres()"
+            ng-if="lb.showPostgresBackup()"
+            ng-disabled="lb.backingUp || lb.syncing || lb.loading">
+      <span ng-if="!lb.backingUp">Backup Postgres to Vultr</span>
+      <span ng-if="lb.backingUp">Backing up…</span>
+    </button>
+    <label class="checkbox-inline backup-after-import" ng-if="lb.showPostgresBackup()">
+      <input type="checkbox" ng-model="lb.backupAfterImport" />
+      Backup after successful import
+    </label>
+    <span class="text-muted sync-meta" ng-if="lb.status.firebaseSync">
+      Employee {{ lb.status.firebaseEmployeeId }} · last sync {{ lb.formatSyncTime(lb.status.firebaseSync.lastSyncAt) }}
+      <span ng-if="lb.status.firebaseSync.importedThroughDate">
+        · imported through {{ lb.status.firebaseSync.importedThroughDate }}
+      </span>
+    </span>
+    <p class="text-muted small sync-hint">
+      Manual forward sync only: new flightIndex rows from the day after your last import through today.
+      Night, XC, and IFR use the same SunCalc / airport rules as the home CSV import.
+    </p>
+    <p class="text-success small" ng-if="lb.syncMessage">{{ lb.syncMessage }}</p>
+    <p class="text-muted small" ng-if="lb.showPostgresBackup()">
+      Suggested flow: import from Firebase, then backup (checkbox runs backup automatically when import succeeds).
+    </p>
+    <p class="text-info small" ng-if="lb.backupMessage">{{ lb.backupMessage }}</p>
+  </div>
+
+  <div class="well well-sm logbook-filters">
+    <div class="row">
+      <div class="col-sm-3">
+        <label>Time period</label>
+        <select class="form-control" ng-model="lb.queryPreset" ng-change="lb.onPresetChange()"
+                ng-options="p.id as p.label for p in lb.periodPresets"></select>
+        <div ng-if="lb.queryPreset === 'calendarYear'" class="filter-year">
+          <label>Year</label>
+          <input class="form-control" type="number" ng-model="lb.calendarYear" min="1980" max="2100"
+                 ng-change="lb.onCalendarYearChange()" />
+        </div>
+        <p class="text-muted small period-hint" ng-if="!lb.isCustomPeriod()">
+          {{ lb.rangeLabel() }}
+        </p>
+      </div>
+      <div class="col-sm-3" ng-if="lb.isCustomPeriod()">
+        <label>From</label>
+        <uib-datepicker ng-model="lb.filterFrom" show-weeks="false" class="well well-sm"></uib-datepicker>
+      </div>
+      <div class="col-sm-3" ng-if="lb.isCustomPeriod()">
+        <label>To</label>
+        <uib-datepicker ng-model="lb.filterTo" show-weeks="false" class="well well-sm"></uib-datepicker>
+      </div>
+      <div class="col-sm-4" ng-class="{'col-sm-offset-3': !lb.isCustomPeriod()}">
+        <label>Search (flight #, tail, remarks)</label>
+        <input class="form-control" type="text" ng-model="lb.searchText" placeholder="e.g. 850 or N404BA" />
+        <label class="checkbox-inline filter-checkbox">
+          <input type="checkbox" ng-model="lb.flightTimeOnly" /> Flights with time only (F.9 / annual)
+        </label>
+      </div>
+      <div class="col-sm-2 filter-actions">
+        <button class="btn btn-primary btn-block" ng-click="lb.runSearch()" ng-disabled="lb.loading">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="alert alert-danger" ng-if="lb.error">{{ lb.error }}</div>
+
+  <div class="logbook-sticky-panel" ng-if="lb.summary || lb.annualResume">
+    <div class="panel panel-default annual-panel" ng-if="lb.annualResume && lb.annualResume.form">
+      <div class="panel-heading">
+        <strong>F.9 Pilot Annual Resume</strong>
+        <span class="text-muted"> — lifetime (all dates in logbook file)</span>
+      </div>
+      <div class="panel-body">
+        <p class="text-muted small annual-note">
+          Career totals from the full mccPilotLog database. PDF fields use <strong>whole minutes</strong>; hours shown for reading.
+        </p>
+        <div class="row annual-fields">
+          <div class="col-sm-4 annual-field" ng-repeat="label in lb.annualFieldOrder">
+            <span class="annual-label">{{ label }}</span>
+            <span class="annual-value">{{ lb.formatHours(lb.annualResume.form[label]) }} hr</span>
+            <span class="annual-hhmm text-muted">PDF: {{ lb.formatFormMinutes(lb.annualResume.form[label]) }} min</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel panel-default totals-panel" ng-if="lb.summary">
+      <div class="panel-heading">
+        <strong>Period totals</strong>
+        <span class="text-muted"> — {{ lb.rangeLabel() }}</span>
+      </div>
+      <div class="panel-body">
+        <div class="row summary-row">
+          <div class="col-sm-2 col-xs-6"><strong>Flights</strong><br />{{ lb.summary.flights }}</div>
+          <div class="col-sm-2 col-xs-6"><strong>Block</strong><br />{{ lb.formatHours(lb.summary.minTotal) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>PIC</strong><br />{{ lb.formatHours(lb.summary.minPIC) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>SIC</strong><br />{{ lb.formatHours(lb.summary.minCoP) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>Dual</strong><br />{{ lb.formatHours(lb.summary.minDual) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>Role total</strong><br />{{ lb.formatHours(lb.roleTotalMinutes()) }} hr</div>
+        </div>
+        <div class="row summary-row">
+          <div class="col-sm-2 col-xs-6"><strong>Night</strong><br />{{ lb.formatHours(lb.summary.minNight) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>XC</strong><br />{{ lb.formatHours(lb.summary.minXC) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>Night XC</strong><br />{{ lb.formatHours(lb.summary.minNightXC) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>IFR</strong><br />{{ lb.formatHours(lb.summary.minIFR) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>Takeoffs</strong><br />{{ lb.summary.takeoffs }}</div>
+          <div class="col-sm-2 col-xs-6"><strong>Landings</strong><br />{{ lb.summary.landings }}</div>
+        </div>
+        <div class="row summary-row summary-row-aircraft">
+          <div class="col-sm-2 col-xs-6"><strong>SEL</strong><br />{{ lb.formatHours(lb.summary.selMinutes) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>MEL</strong><br />{{ lb.formatHours(lb.summary.melMinutes) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>Turbine</strong><br />{{ lb.formatHours(lb.summary.turbineMinutes) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>Helicopter</strong><br />{{ lb.formatHours(lb.summary.helicopterMinutes) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>Simulator</strong><br />{{ lb.formatHours(lb.summary.simulatorMinutes) }} hr</div>
+          <div class="col-sm-2 col-xs-6"><strong>Other</strong><br />{{ lb.formatHours(lb.summary.otherMinutes) }} hr</div>
+        </div>
+        <p class="text-muted small career-note" ng-if="lb.status && lb.status.careerPicMinutes">
+          Career PIC in this file (all dates): about {{ lb.formatHours(lb.status.careerPicMinutes) }} hr.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <p ng-if="lb.loading"><span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Loading…</p>
+
+  <table class="table table-striped table-condensed" ng-if="!lb.loading && lb.flights.length">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Flt#</th>
+        <th>Tail</th>
+        <th>Time</th>
+        <th>PIC</th>
+        <th>XC</th>
+        <th>Night</th>
+        <th>IFR</th>
+        <th>TO/Ldg</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="f in lb.flights">
+        <td>{{ lb.formatDate(f.flightDate) }}</td>
+        <td>{{ f.flightNumber }}</td>
+        <td>{{ f.aircraft || '—' }}</td>
+        <td>{{ lb.formatMinutes(f.minTotal) }}</td>
+        <td>{{ lb.formatMinutes(f.minPIC) }}</td>
+        <td>{{ lb.formatMinutes(f.minXC) }}</td>
+        <td>{{ lb.formatMinutes(f.minNight) }}</td>
+        <td>{{ lb.formatMinutes(f.minIFR) }}</td>
+        <td>{{ f.toDay }}/{{ f.ldgDay }} <span ng-if="f.toNight || f.ldgNight">· N {{ f.toNight }}/{{ f.ldgNight }}</span></td>
+        <td class="remarks-cell">{{ f.remarks }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p ng-if="!lb.loading && !lb.flights.length && !lb.error">No flights in this range.</p>
+
+  <div class="pager-row" ng-if="lb.total > lb.limit">
+    <button class="btn btn-default" ng-click="lb.prevPage()" ng-disabled="lb.offset <= 0">Previous</button>
+    <span class="page-label">{{ lb.pageLabel() }}</span>
+    <button class="btn btn-default" ng-click="lb.nextPage()" ng-disabled="lb.offset + lb.limit >= lb.total">Next</button>
+  </div>
+</div>
